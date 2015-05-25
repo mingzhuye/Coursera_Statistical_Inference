@@ -1,0 +1,93 @@
+---
+title: "Basic Inferential Data Analysis on R Dataset--ToothGrowth"
+author: ' by Mingzhu Ye'
+output:
+  pdf_document:
+    toc_depth: 4
+  html_document: default
+---
+
+##Overview  
+We're going to load the "ToothGrowth" data and perform some basic exploratory data analysis, provide a basic summary of the data, use confidence intervals and hypothesis tests to compare tooth growth by supp and dose. To figure out details about "ToothGrowth" please check the '?ToothGrowth' in R Help Documentation. 
+
+##Data Analysis
+We will do Data Processing, Data Exploratory Analysis, Regression Models for "ToothGrowth" for this section.   
+
+###Data Processing  
+
+This is the head of "ToothGrowth", there're 3 variables in the data frame.       
+
+```{r, echo= FALSE}
+library(datasets)
+data(ToothGrowth)
+head(ToothGrowth, n = 3)
+```
+
+This is the summary of "ToothGrowth". Specifically, 'supp' is an abbreviation for supplement which is divided into two groups, OJ & VC. 
+
+```{r, echo = FALSE}
+summary(ToothGrowth)
+```
+    
+###Data Exploratory Analysis  
+     
+```{r, }
+coplot(len ~ dose | supp, data = ToothGrowth, panel = panel.smooth,
+       xlab = "ToothGrowth data: length vs dose, given type of supplement")
+```
+
+As observed in the coplot, tooth length has positive correlation with dose when supp is either OJ or VC.   
+
+###Regression Models for "ToothGrowth"
+
+```{r, echo = FALSE}
+fit <- lm(len~dose+supp, data= ToothGrowth)
+summary(fit)
+```
+
+As shown in the regression model, average length for guinea pigs is 9.7725 without any types of supplement(VC or OJ). Coefficients of dose is 9.7636. Coefficients of supp is -3.7000. 
+
+##Relevant Confidence Intervals and Tests
+
+Split data based on dosage of 0.5, 1.0, 2.0
+
+```{r}
+d_0.5 <- subset(ToothGrowth, dose == 0.5)
+d_1.0 <- subset(ToothGrowth, dose == 1.0)
+d_2.0 <- subset(ToothGrowth, dose == 2.0)
+```
+
+T-test between len and supp under dose = 0.5
+
+```{r}
+test0.5 <- t.test (len ~ supp, paired = FALSE, var.equal = FALSE, data = d_0.5)
+test0.5$p.value
+```
+
+T-test between len and supp under dose = 1.0
+
+```{r}
+test1.0 <- t.test (len ~ supp, paired = FALSE, var.equal = FALSE, data = d_1.0)
+test1.0$p.value
+```
+
+T-test between len and supp under dose = 2.0
+
+```{r}
+test2.0 <- t.test (len ~ supp, paired = FALSE, var.equal = FALSE, data = d_2.0)
+test2.0$p.value
+```
+
+T-test Observation:   
+T-test shows dose of 0.5 and 1.0 have relatively low P-value(0.006358607, 0.001038376), while dose of 2.0 has pretty high P-value(0.9638516). 
+For P-values > 0.05, we fail to reject the null hypothesis, there are no differences in supplements between different dosage. Difference in mean values between the supplements is not significant. On the contrary, likewise. 
+
+##Assumption   
+
+1.Supplements(OJ or VC) do have effects on the length of Tooth Growth.  
+2.The guinea pigs sample is not diverse, and sample size is not big enough.   
+3.Samples are unpaired and variances are unequal. 
+
+##Conclusion 
+
+Supplements of OJ or VC have significantly different effects on pig's tooth length growth for lower(0.5, 1.0) dosages of supplements according to the T-test. However, there is no significant difference in tooth length growth when dosage is high(2.0). OJ yields a longer tooth growth under the dosage of 0.5 or 1.0. 
